@@ -5,10 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --watchAll",
-    "input": "node src/scripts/input.js",
     "solve": "node src/scripts/solution.js",
     "init": "node src/scripts/init.js",
-    "problem": "node src/scripts/problem.js",
     "test-today": "jest --watchAll --testPathPattern=`date +'%Y/day%d'`",
     "env": "node src/scripts/env.js"
   },
