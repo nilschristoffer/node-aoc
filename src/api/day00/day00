@@ -1,0 +1,7 @@
+export const solveStar1 = (input: string[]) => {
+  return input.length;
+};
+
+export const solveStar2 = (input: string[]) => {
+  return input.length;
+};
