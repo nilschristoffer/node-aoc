@@ -1,5 +1,4 @@
-import { sessionKey } from "../env.js";
-import { getDayUrl, handleErrors } from "./helpers/helpers.js";
+import { getDayUrl, handleErrors, config } from "./helpers/helpers.js";
 import { JSDOM } from "jsdom";
 
 export const getProblem = async (year, day) => {
@@ -8,7 +7,7 @@ export const getProblem = async (year, day) => {
   try {
     const response = await fetch(url, {
       headers: {
-        cookie: `session=${sessionKey}`,
+        cookie: `session=${config.SESSION_KEY}`,
       },
     });
 

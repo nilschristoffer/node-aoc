@@ -4,8 +4,8 @@ import {
   getTimeToRelease,
   handleErrors,
   msToReadable,
+  config,
 } from "./helpers/helpers.js";
-import { sessionKey } from "../env.js";
 import { JSDOM } from "jsdom";
 
 const strToNum = (time) => {
@@ -37,7 +37,7 @@ export const postSolution = async (year, day, part, solution) => {
 
   return fetch(`${url}/answer`, {
     headers: {
-      cookie: `session=${sessionKey}`,
+      cookie: `session=${config.SESSION_KEY}`,
       "content-type": "application/x-www-form-urlencoded",
     },
     method: "POST",

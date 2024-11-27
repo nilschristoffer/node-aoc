@@ -5,7 +5,6 @@ import url from "url";
 import { getInput } from "../api/getInput.js";
 import { getProblem } from "../api/getProblem.js";
 import { copyFile, createFile, colog } from "../api/helpers/helpers.js";
-import { defaultYear } from "../env.js";
 import PromptSync from "prompt-sync";
 import { postSolution } from "../api/postSolution.js";
 import { exec } from "child_process";

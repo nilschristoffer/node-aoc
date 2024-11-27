@@ -1,5 +1,8 @@
 import kleur from "kleur";
 import fs from "fs/promises";
+import { config as configEnv } from "dotenv";
+
+configEnv();
 
 export const BASE_URL = "https://adventofcode.com";
 
@@ -109,4 +112,8 @@ export const colog = {
   succ: (msg) => console.log(kleur.green(msg)),
   warn: (msg) => console.log(kleur.yellow(msg)),
   default: (msg) => console.log(kleur.gray(msg)),
+};
+
+export const config = {
+  SESSION_KEY: process.env.SESSION_KEY,
 };

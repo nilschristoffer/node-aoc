@@ -5,13 +5,13 @@ import {
   getTimeToRelease,
   handleErrors,
   colog,
+  config,
 } from "./helpers/helpers.js";
 import PromptSync from "prompt-sync";
-import { defaultYear, sessionKey } from "../env.js";
 
 const prompt = PromptSync({ sigint: true });
 
-export const getInput = async (day, year = defaultYear) => {
+export const getInput = async (day, year = new Date().getFullYear()) => {
   const timeToRelease = getTimeToRelease(day, year);
   if (timeToRelease > 0) {
     const releaseDate = getReleaseDate(day, year);
@@ -49,7 +49,7 @@ export const getInput = async (day, year = defaultYear) => {
 
   return fetch(inputUrl, {
     headers: {
-      cookie: `session=${sessionKey}`,
+      cookie: `session=${config.SESSION_KEY}`,
     },
   })
     .then((res) => {
