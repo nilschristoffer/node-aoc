@@ -99,11 +99,12 @@ export const createFile = async (dest, content, overwrite = false) => {
       colog.warn(`Use --overwrite flag to overwrite it.`);
       return;
     }
+    throw new Error("File already exists");
   } catch (e) {
-  } finally {
     colog.default(`\nCreating file ${dest}...`);
     fs.writeFile(dest, content);
     colog.succ(`File ${dest} created successfully!`);
+  } finally {
   }
 };
 
