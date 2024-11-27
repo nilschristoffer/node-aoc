@@ -7,8 +7,7 @@
     "test": "jest --watchAll",
     "solve": "node src/scripts/solution.js",
     "init": "node src/scripts/init.js",
-    "test-today": "jest --watchAll --testPathPattern=`date +'%Y/day%d'`",
-    "env": "node src/scripts/env.js"
+    "test-today": "jest --watchAll --testPathPattern=`date +'%Y/day%d'`"
   },
   "keywords": [],
   "author": "",
