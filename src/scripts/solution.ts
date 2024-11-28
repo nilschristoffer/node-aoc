@@ -1,13 +1,13 @@
 import promptSync from "prompt-sync";
-import { postSolution } from "../api/postSolution.js";
-import { colog } from "../api/helpers/helpers.js";
+import { postSolution } from "../api/postSolution";
+import { colog } from "../api/helpers/helpers";
 
 const [fYear, fDay, fPart, fAns] = process.argv.slice(2);
 
 const prompt = promptSync({ sigint: true });
 
 const year = (fYear ?? prompt("Year: ")) || new Date().getFullYear();
-colog.default(year);
+colog.default(year.toString());
 
 const day = (fDay ?? prompt("Day: ")) || new Date().getDate().toString();
 colog.default(day);
@@ -19,7 +19,7 @@ const answer = fAns ?? prompt("Answer: ");
 colog.default(answer);
 
 if (answer) {
-  postSolution(year, day, part, answer);
+  postSolution(Number(year), Number(day), Number(part), answer);
 } else {
   colog.warn("No answer provided, exiting...");
 }

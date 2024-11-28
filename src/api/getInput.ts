@@ -6,12 +6,12 @@ import {
   handleErrors,
   colog,
   config,
-} from "./helpers/helpers.js";
+} from "./helpers/helpers";
 import PromptSync from "prompt-sync";
 
 const prompt = PromptSync({ sigint: true });
 
-export const getInput = async (day, year = new Date().getFullYear()) => {
+export const getInput = async (day: number, year = new Date().getFullYear()) => {
   const timeToRelease = getTimeToRelease(day, year);
   if (timeToRelease > 0) {
     const releaseDate = getReleaseDate(day, year);

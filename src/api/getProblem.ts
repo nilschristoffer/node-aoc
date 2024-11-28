@@ -1,7 +1,7 @@
-import { getDayUrl, handleErrors, config } from "./helpers/helpers.js";
+import { getDayUrl, handleErrors, config } from "./helpers/helpers";
 import { JSDOM } from "jsdom";
 
-export const getProblem = async (year, day) => {
+export const getProblem = async (year: number, day: number) => {
   const url = getDayUrl(day, year);
 
   try {
@@ -15,14 +15,21 @@ export const getProblem = async (year, day) => {
 
     const $main = new JSDOM(body).window.document.querySelector("main");
 
-    $main.style =
-      "background-color: #0f0f23; color: lightgray; padding: 20px; margin: -20px; font-size: 12px; font-family: monospace";
+    if (!$main) {
+      return "COULD NOT FIND MAIN ELEMENT";
+    }
 
+      $main.style.backgroundColor = "#0f0f23";
+      $main.style.color = "lightgray";
+      $main.style.padding = "20px";
+      $main.style.margin = "-20px";
+      $main.style.fontSize = "12px";
+      $main.style.fontFamily = "monospace";
     const style =
       '<style> code { background-color: #10101a; display: inline-block; border: "1px solid grey";} em { color: white; text-shadow: white 0 0 5px;}</style>';
 
     return `${style}${$main?.outerHTML}`;
-  } catch (e) {
+  } catch (e: Error | any) {
     return handleErrors(e);
   }
 };

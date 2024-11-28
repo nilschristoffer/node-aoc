@@ -5,10 +5,11 @@ import {
   handleErrors,
   msToReadable,
   config,
-} from "./helpers/helpers.js";
+  timeToReadable,
+} from "./helpers/helpers";
 import { JSDOM } from "jsdom";
 
-const strToNum = (time) => {
+const strToNum = (time: string) => {
   const entries = {
     one: 1,
     two: 2,
@@ -22,10 +23,10 @@ const strToNum = (time) => {
     ten: 10,
   };
 
-  return entries[time] || NaN;
+  return entries[time as keyof typeof entries] || NaN;
 };
 
-export const postSolution = async (year, day, part, solution) => {
+export const postSolution = async (year: number, day: number, part: number, solution: string) => {
   const remainingMs = getTimeToRelease(day, year);
 
   if (remainingMs > 0) {
@@ -57,20 +58,20 @@ export const postSolution = async (year, day, part, solution) => {
 
       const info =
         $main !== null
-          ? $main.textContent.replace(/\[.*\]/, "").trim()
+          ? $main?.textContent?.replace(/\[.*\]/, "")?.trim()
           : "Can't find the main element";
 
-      if (info.includes("That's the right answer")) {
+      if (info?.includes("That's the right answer")) {
         console.log(`Status`, kleur.green(`DAY ${day} PART ${part} SOLVED!`));
         return "SOLVED";
-      } else if (info.includes("That's not the right answer")) {
+      } else if (info?.includes("That's not the right answer")) {
         console.log("Status:", kleur.red("WRONG ANSWER"));
         console.log(`\n${info}\n`);
         status = "WRONG";
-      } else if (info.includes("You gave an answer too recently")) {
+      } else if (info?.includes("You gave an answer too recently")) {
         console.log("Status:", kleur.red("TO SOON"));
       } else if (
-        info.includes("You don't seem to be solving the right level")
+        info?.includes("You don't seem to be solving the right level")
       ) {
         console.log("Status:", kleur.yellow("ALREADY COMPLETED or LOCKED"));
       } else {
@@ -78,10 +79,10 @@ export const postSolution = async (year, day, part, solution) => {
         console.log(`\n${info}\n`);
       }
 
-      const waitStr = info.match(
+      const waitStr = info?.match(
         /(one|two|three|four|five|six|seven|eight|nine|ten) (second|minute|hour|day)/
       );
-      const waitNum = info.match(/\d+\s*(s|m|h|d)/g);
+      const waitNum = info?.match(/\d+\s*(s|m|h|d)/g);
 
       if (waitStr !== null || waitNum !== null) {
         const waitTime = {
@@ -91,16 +92,16 @@ export const postSolution = async (year, day, part, solution) => {
           d: 0,
         };
 
-        if (waitStr !== null) {
+        if (waitStr) {
           const [, time, unit] = waitStr;
-          waitTime[unit[0]] = strToNum(time);
-        } else if (waitNum !== null) {
+          waitTime[unit[0] as keyof typeof waitTime] = strToNum(time);
+        } else if (waitNum) {
           waitNum.forEach((x) => {
-            waitTime[x.slice(-1)] = Number(x.slice(0, -1));
+            waitTime[x.slice(-1) as keyof typeof waitTime] = Number(x.slice(0, -1));
           });
         }
 
-        const delayStr = msToReadable(
+        const delayStr = timeToReadable(
           waitTime.d,
           waitTime.h,
           waitTime.m,

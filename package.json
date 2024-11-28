@@ -5,13 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --watchAll",
-    "solve": "node src/scripts/solution.js",
-    "init": "node src/scripts/init.js",
+    "solve": "ts-node src/scripts/solution.ts",
+    "init": "ts-node src/scripts/init.ts",
     "test-today": "jest --watchAll --testPathPattern=`date +'%Y/day%d'`"
   },
   "keywords": [],
   "author": "",
-  "type": "module",
   "license": "ISC",
   "devDependencies": {
     "@babel/preset-env": "^7.26.0",
@@ -26,6 +25,7 @@
     "prompt-sync": "^4.2.0",
     "rimraf": "^6.0.1",
     "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
   },
   "jest": {
@@ -40,5 +40,7 @@
     "testMatch": [
       "**/src/**/*.test.+(ts|tsx|js)"
     ]
+  },
+  "dependencies": {
   }
 }

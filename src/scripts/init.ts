@@ -1,10 +1,9 @@
 import fs from "fs";
 import path from "path";
-import url from "url";
 
-import { getInput } from "../api/getInput.js";
-import { getProblem } from "../api/getProblem.js";
-import { copyFile, createFile, colog } from "../api/helpers/helpers.js";
+import { getInput } from "../api/getInput";
+import { getProblem } from "../api/getProblem";
+import { copyFile, createFile, colog } from "../api/helpers/helpers";
 import PromptSync from "prompt-sync";
 import { postSolution } from "../api/postSolution.js";
 import { exec } from "child_process";
@@ -17,8 +16,6 @@ const day = (process.argv[2] || new Date().getDate())
 const year = process.argv[3] || new Date().getFullYear();
 
 (async () => {
-  const __filename = url.fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
   const yearDir = path.join(__dirname, "..", "solutions", year.toString());
   const dayDir = path.join(yearDir, `day${day}`);
   const outputFiles = {
@@ -64,14 +61,14 @@ const year = process.argv[3] || new Date().getFullYear();
   exec(`code -r ${outputFiles.testInput}`);
 
   // input.txt
-  const input = await getInput(Number(day), year);
+  const input = await getInput(Number(day), Number(year));
   if (input) {
     await createFile(outputFiles.input, input);
     exec(`code -r ${outputFiles.input}`);
   }
 
   // problem.html
-  const prob = await getProblem(year, parseInt(day));
+  const prob = await getProblem(Number(year), Number(day));
   if (prob) {
     await createFile(outputFiles.prob, prob, true);
     exec(`code -r ${outputFiles.prob}`);
@@ -84,14 +81,14 @@ const year = process.argv[3] || new Date().getFullYear();
   const ans1 = prompt("\nSolution star 1 [Enter to skip]:\n");
 
   if (ans1) {
-    await postSolution(year, day, 1, ans1);
+    await postSolution(Number(year), Number(day), 1, ans1);
   } else {
     colog.warn("Solution star 1 skipped!");
   }
 
   const ans2 = prompt("\nSolution star 2 [Enter to skip]:\n");
   if (ans2) {
-    await postSolution(year, day, 2, ans2);
+    await postSolution(Number(year), Number(day), 2, ans2);
   } else {
     colog.warn("Solution star 2 skipped!");
   }
