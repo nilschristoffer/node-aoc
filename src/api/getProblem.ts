@@ -16,15 +16,15 @@ export const getProblem = async (year: number, day: number) => {
     const $main = new JSDOM(body).window.document.querySelector("main");
 
     if (!$main) {
-      return "COULD NOT FIND MAIN ELEMENT";
+      return null;
     }
 
-      $main.style.backgroundColor = "#0f0f23";
-      $main.style.color = "lightgray";
-      $main.style.padding = "20px";
-      $main.style.margin = "-20px";
-      $main.style.fontSize = "12px";
-      $main.style.fontFamily = "monospace";
+    $main.style.backgroundColor = "#0f0f23";
+    $main.style.color = "lightgray";
+    $main.style.padding = "20px";
+    $main.style.margin = "-20px";
+    $main.style.fontSize = "12px";
+    $main.style.fontFamily = "monospace";
     const style =
       '<style> code { background-color: #10101a; display: inline-block; border: "1px solid grey";} em { color: white; text-shadow: white 0 0 5px;}</style>';
 

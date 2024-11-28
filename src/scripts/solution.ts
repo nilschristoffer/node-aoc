@@ -1,25 +1,67 @@
-import promptSync from "prompt-sync";
 import { postSolution } from "../api/postSolution";
 import { colog } from "../api/helpers/helpers";
+import { program } from "commander";
+import inquirer from "inquirer";
+import ora from "ora";
 
-const [fYear, fDay, fPart, fAns] = process.argv.slice(2);
+program.version("1.0.0").description("Post solution for a specific day");
 
-const prompt = promptSync({ sigint: true });
+program.action(async () => {
+  let { year, day, part, ans } = await inquirer.prompt([
+    {
+      type: "input",
+      name: "year",
+      message: "Select year:",
+      default: new Date().getFullYear().toString(),
+    },
+    {
+      type: "input",
+      name: "day",
+      message: "Select day:",
+      default: new Date().getDate().toString(),
+    },
+    {
+      type: "select",
+      name: "part",
+      choices: ["1", "2"],
+      message: "Select part:",
+      default: "1",
+    },
+    {
+      type: "input",
+      name: "ans",
+      message: "Select answer:",
+      default: "",
+    },
+  ]);
 
-const year = (fYear ?? prompt("Year: ")) || new Date().getFullYear();
-colog.default(year.toString());
+  day = day.padStart(2, "0");
 
-const day = (fDay ?? prompt("Day: ")) || new Date().getDate().toString();
-colog.default(day);
+  if (!ans) {
+    process.exit(0);
+  }
 
-const part = (fPart ?? prompt("Part: ")) || "1";
-colog.default(part);
+  const ansSpinner = ora("Posting solution...").start();
+  const { res, info } = await postSolution(
+    Number(year),
+    Number(day),
+    Number(part),
+    ans
+  );
+  switch (res) {
+    case "SOLVED":
+      ansSpinner.succeed("Solution solved successfully!");
+      info && colog.succ(info);
+      break;
+    case "WAIT":
+      ansSpinner.warn("You have to wait!");
+      info && colog.warn(info);
+      break;
+    default:
+      ansSpinner.fail("Solution was not solved!");
+      info && colog.err(info);
+      break;
+  }
+});
 
-const answer = fAns ?? prompt("Answer: ");
-colog.default(answer);
-
-if (answer) {
-  postSolution(Number(year), Number(day), Number(part), answer);
-} else {
-  colog.warn("No answer provided, exiting...");
-}
+program.parse(process.argv);

@@ -42,5 +42,8 @@
     ]
   },
   "dependencies": {
+    "commander": "^12.1.0",
+    "inquirer": "^12.1.0",
+    "ora": "^5.4.1"
   }
 }

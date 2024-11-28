@@ -11,7 +11,10 @@ import PromptSync from "prompt-sync";
 
 const prompt = PromptSync({ sigint: true });
 
-export const getInput = async (day: number, year = new Date().getFullYear()) => {
+export const getInput = async (
+  day: number,
+  year = new Date().getFullYear()
+) => {
   const timeToRelease = getTimeToRelease(day, year);
   if (timeToRelease > 0) {
     const releaseDate = getReleaseDate(day, year);
@@ -27,7 +30,7 @@ export const getInput = async (day: number, year = new Date().getFullYear()) => 
       )
     );
     if (ans !== "y") {
-      colog.warn("Please fetch manually late!");
+      colog.warn("Please fetch manually later!");
       return;
     }
 
@@ -47,20 +50,21 @@ export const getInput = async (day: number, year = new Date().getFullYear()) => 
   const url = getDayUrl(day, year);
   const inputUrl = `${url}/input`;
 
-  return fetch(inputUrl, {
-    headers: {
-      cookie: `session=${config.SESSION_KEY}`,
-    },
-  })
-    .then((res) => {
-      if (res.status !== 200) {
-        throw new Error(String(res.status));
-      }
+  try {
+    const result = await fetch(inputUrl, {
+      headers: {
+        cookie: `session=${config.SESSION_KEY}`,
+      },
+    });
 
-      return res.text();
-    })
-    .then((body) => {
-      return body.replace(/\n$/, "");
-    })
-    .catch(handleErrors);
+    if (result.status !== 200) {
+      throw new Error(String(result.status));
+    }
+
+    const res = await result.text();
+
+    return res.replace(/\n$/, "");
+  } catch (e: Error | any) {
+    handleErrors(e);
+  }
 };
