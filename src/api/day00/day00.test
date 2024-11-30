@@ -8,6 +8,7 @@ const YEAR = parseInt(
 );
 
 const testInput = textReaderArr(DAY, "test", YEAR);
+const testInput2 = textReaderArr(DAY, "test2", YEAR);
 const input = textReaderArr(DAY, "input", YEAR);
 
 describe("Day " + DAY, () => {
