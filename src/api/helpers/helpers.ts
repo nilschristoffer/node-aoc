@@ -1,12 +1,13 @@
 import kleur from "kleur";
 import fs from "fs/promises";
 import { config as configEnv } from "dotenv";
+import inquirer from "inquirer";
 
 configEnv();
 
 export const BASE_URL = "https://adventofcode.com";
 
-export const getTimeToRelease = (day:number, year:number) => {
+export const getTimeToRelease = (day: number, year: number) => {
   const releaseDate = getReleaseDate(day, year);
 
   const today = new Date();
@@ -14,13 +15,13 @@ export const getTimeToRelease = (day:number, year:number) => {
   return releaseDate.getTime() - today.getTime();
 };
 
-export const getReleaseDate = (day:number, year:number) => {
+export const getReleaseDate = (day: number, year: number) => {
   return new Date(
     `${year}-12-${day.toString().padStart(2, "0")}T05:00:00.000Z`
   );
 };
 
-export const getDayUrl = (day: number, year:number) => {
+export const getDayUrl = (day: number, year: number) => {
   return `${BASE_URL}/${year}/day/${day}`;
 };
 
@@ -91,7 +92,11 @@ export const copyFile = async (
   }
 };
 
-export const createFile = async (dest: string, content: string, overwrite = false) => {
+export const createFile = async (
+  dest: string,
+  content: string,
+  overwrite = false
+) => {
   try {
     await fs.stat(dest);
     if (!overwrite) {
@@ -117,4 +122,53 @@ export const colog = {
 
 export const config = {
   SESSION_KEY: process.env.SESSION_KEY,
+};
+
+export const promptYear = async (): Promise<string> => {
+  const { year } = await inquirer.prompt<{ year: string }>([
+    {
+      type: "number",
+      name: "year",
+      message: "Select year:",
+      default: new Date().getFullYear(),
+      validate: (input?: number) => {
+        if (input && (input < 2015 || input > new Date().getFullYear())) {
+          return `Year must be between 2015 and ${new Date().getFullYear()}`;
+        }
+        return true;
+      },
+    },
+  ]);
+  return year.toString();
+};
+
+export const promptDay = async (): Promise<string> => {
+  const { day } = await inquirer.prompt<{ day: number }>([
+    {
+      type: "number",
+      name: "day",
+      message: "Select day [1-25]:",
+      default: Math.min(25, new Date().getDate()),
+      validate: (input?: number) => {
+        if (input && (input < 1 || input > 25)) {
+          return "Day must be between 1 and 25";
+        }
+        return true;
+      },
+    },
+  ]);
+  return day.toString().padStart(2, "0");
+};
+
+export const promptAnswer = async (args?: {
+  message?: string;
+}): Promise<string> => {
+  const { ans } = await inquirer.prompt<{ ans: string }>([
+    {
+      type: "input",
+      name: "ans",
+      message: args?.message || "Select answer:",
+    },
+  ]);
+  return ans;
 };

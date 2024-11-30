@@ -30,6 +30,6 @@ export const getProblem = async (year: number, day: number) => {
 
     return `${style}${$main?.outerHTML}`;
   } catch (e: Error | any) {
-    return handleErrors(e);
+    return "";
   }
 };

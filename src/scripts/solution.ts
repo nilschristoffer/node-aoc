@@ -1,5 +1,5 @@
 import { postSolution } from "../api/postSolution";
-import { colog } from "../api/helpers/helpers";
+import { colog, promptDay, promptYear } from "../api/helpers/helpers";
 import { program } from "commander";
 import inquirer from "inquirer";
 import ora from "ora";
@@ -7,23 +7,16 @@ import ora from "ora";
 program.version("1.0.0").description("Post solution for a specific day");
 
 program.action(async () => {
-  let { year, day, part, ans } = await inquirer.prompt([
-    {
-      type: "input",
-      name: "year",
-      message: "Select year:",
-      default: new Date().getFullYear().toString(),
-    },
-    {
-      type: "input",
-      name: "day",
-      message: "Select day:",
-      default: new Date().getDate().toString(),
-    },
+  const year = await promptYear();
+  const day = await promptDay();
+  const { part, ans } = await inquirer.prompt([
     {
       type: "select",
       name: "part",
-      choices: ["1", "2"],
+      choices: [
+        { name: "*", value: "1" },
+        { name: "**", value: "2" },
+      ],
       message: "Select part:",
       default: "1",
     },
@@ -32,14 +25,14 @@ program.action(async () => {
       name: "ans",
       message: "Select answer:",
       default: "",
+      validate: (input: string) => {
+        if (!input?.length) {
+          return "Answer cannot be empty";
+        }
+        return true;
+      },
     },
   ]);
-
-  day = day.padStart(2, "0");
-
-  if (!ans) {
-    process.exit(0);
-  }
 
   const ansSpinner = ora("Posting solution...").start();
   const { res, info } = await postSolution(

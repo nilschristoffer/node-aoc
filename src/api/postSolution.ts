@@ -4,7 +4,6 @@ import {
   handleErrors,
   msToReadable,
   config,
-  colog,
 } from "./helpers/helpers";
 import { JSDOM } from "jsdom";
 
@@ -77,7 +76,6 @@ export const postSolution = async (
       };
     }
   } catch (error: Error | any) {
-    handleErrors(error);
     return {
       res: "ERROR",
       info: error.message,

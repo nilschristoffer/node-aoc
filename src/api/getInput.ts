@@ -65,6 +65,6 @@ export const getInput = async (
 
     return res.replace(/\n$/, "");
   } catch (e: Error | any) {
-    handleErrors(e);
+    return "";
   }
 };
