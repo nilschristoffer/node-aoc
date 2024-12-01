@@ -45,6 +45,15 @@ const promptSolve = async (year: string, day: string, part: 1 | 2) => {
   }
 };
 
+const checkIfPathExists = async (path: string) => {
+  try {
+    await fs.stat(path);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 program.version("1.0.0").description("Get aoc files for a specific day");
 
 const sourceDir = path.join(__dirname, "..", "api", "day00");
@@ -68,45 +77,53 @@ program.action(async () => {
   };
 
   const yearSpinner = ora(`Checking for year ${year} directory...`).start();
-  try {
-    await fs.stat(yearDir);
+  if (await checkIfPathExists(yearDir)) {
     yearSpinner.succeed(`Year ${year} directory found!`);
-  } catch (e) {
+  } else {
     yearSpinner.text = `Creating year ${year} directory. ..`;
     await fs.mkdir(yearDir);
     yearSpinner.succeed(`Year ${year} directory created successfully!`);
   }
 
   const daySpinner = ora(`Checking for day ${day} directory...`).start();
-  try {
-    await fs.stat(dayDir);
+  if (await checkIfPathExists(dayDir)) {
     daySpinner.succeed(`Day ${day} directory found!`);
-  } catch (e) {
+  } else {
     daySpinner.text = `Creating day ${day} directory...`;
     await fs.mkdir(dayDir);
     daySpinner.succeed(`Day ${day} directory created successfully!`);
   }
 
   // day.ts
-  const dayFileSpinner = ora(`Creating day${day}.ts...`).start();
-  await fs.copyFile(sourceFiles.solution, outputFiles.solution);
-  dayFileSpinner.succeed(`day${day}.ts created successfully!`);
+  const dayFileSpinner = ora(`Checking if day${day}.ts exists...`);
+  if (await checkIfPathExists(outputFiles.solution)) {
+    dayFileSpinner.succeed(`day${day}.ts found!`);
+  } else {
+    dayFileSpinner.text = `Creating day${day}.ts...`;
+    await fs.copyFile(sourceFiles.solution, outputFiles.solution);
+    dayFileSpinner.succeed(`day${day}.ts created successfully!`);
+  }
 
   // day.test.ts
-  const testFileSpinner = ora(`Creating day${day}.test.ts...`).start();
-  const testFileSrc = await fs.readFile(sourceFiles.test, "utf8");
-  await fs.writeFile(
-    outputFiles.test,
-    testFileSrc.replace("day00", `day${day}`)
-  );
-  testFileSpinner.succeed(`day${day}.test.ts created successfully!`);
+  const testFileSpinner = ora(`Checking if day${day}.test.ts exists`).start();
+  if (await checkIfPathExists(outputFiles.test)) {
+    testFileSpinner.succeed(`day${day}.test.ts found!`);
+  } else {
+    testFileSpinner.text = `Creating day${day}.test.ts...`;
+
+    const testFileSrc = await fs.readFile(sourceFiles.test, "utf8");
+    await fs.writeFile(
+      outputFiles.test,
+      testFileSrc.replace("day00", `day${day}`)
+    );
+    testFileSpinner.succeed(`day${day}.test.ts created successfully!`);
+  }
 
   // test.txt
   const testInputSpinner = ora(`Checking test.txt...`).start();
-  try {
-    await fs.stat(outputFiles.testInput);
-    testInputSpinner.warn(`test.txt found! Skipping creation...`);
-  } catch (e) {
+  if (await checkIfPathExists(outputFiles.testInput)) {
+    testInputSpinner.succeed(`test.txt found!`);
+  } else {
     testInputSpinner.text = "Creating test.txt...";
     await fs.writeFile(outputFiles.testInput, "");
     testInputSpinner.succeed(`test.txt created successfully!`);
@@ -114,10 +131,9 @@ program.action(async () => {
 
   // test2.txt
   const testInput2Spinner = ora(`Checking test2.txt...`).start();
-  try {
-    await fs.stat(path.join(dayDir, "test2.txt"));
-    testInput2Spinner.warn(`test2.txt found! Skipping creation...`);
-  } catch (e) {
+  if (await checkIfPathExists(path.join(dayDir, "test2.txt"))) {
+    testInput2Spinner.succeed(`test2.txt found!`);
+  } else {
     testInput2Spinner.text = "Creating test2.txt...";
     await fs.writeFile(path.join(dayDir, "test2.txt"), "");
     testInput2Spinner.succeed(`test2.txt created successfully!`);

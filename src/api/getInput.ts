@@ -31,7 +31,7 @@ export const getInput = async (
     );
     if (ans !== "y") {
       colog.warn("Please fetch manually later!");
-      return;
+      return null;
     }
 
     colog.succ(
@@ -40,7 +40,7 @@ export const getInput = async (
       )} seconds for day ${day} of year ${year}`
     );
 
-    return new Promise((resolve) => {
+    return new Promise<string | null>((resolve) => {
       setTimeout(() => {
         resolve(getInput(day, year));
       }, timeToRelease);
