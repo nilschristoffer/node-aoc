@@ -13,10 +13,9 @@ export const textReader: TextReader<string> = (
     const path = `${__dirname}/../solutions/${year}/day${day
       .toString()
       .padStart(2, "0")}/${fileName}.txt`;
-    console.log(path);
     return readFileSync(path, "utf-8").toString();
   } catch (error) {
-    console.log(`Error reading file for day ${day} and fileName ${fileName}`);
+    console.warn(`Error reading file for day ${day} and fileName ${fileName}`);
     return "";
   }
 };
