@@ -40,11 +40,11 @@ export const getInput = async (
       )} seconds for day ${day} of year ${year}`
     );
 
-    let res;
-    setTimeout(() => {
-      res = getInput(day, year);
-    }, timeToRelease);
-    return res;
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(getInput(day, year));
+      }, timeToRelease);
+    });
   }
 
   const url = getDayUrl(day, year);
