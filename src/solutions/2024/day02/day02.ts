@@ -1,34 +1,24 @@
-const diffs = (levels: number[]): number[] => {
-  const diffs = [];
-  for (let i = 1; i < levels.length; i++) {
-    diffs.push(levels[i] - levels[i - 1]);
-  }
-  return diffs;
-};
+const diffs = (levels: number[]): number[] =>
+  levels.slice(1).map((l, i) => l - levels[i]);
 
-const isAllPositive = (diffs: number[]): boolean => {
-  return diffs.every((diff) => diff >= 0);
-};
+const isAllMost = (values: number[], max: number): boolean =>
+  values.every((val) => val <= max);
 
-const isAllNegative = (diffs: number[]): boolean => {
-  return diffs.every((diff) => diff <= 0);
-};
-
-const isAllLeast = (diffs: number[], val: number): boolean => {
-  return diffs.every((diff) => Math.abs(diff) <= val);
-};
-
-const isAllMost = (diffs: number[], val: number): boolean => {
-  return diffs.every((diff) => Math.abs(diff) >= val);
-};
+const isAllLeast = (values: number[], min: number): boolean =>
+  values.every((val) => val >= min);
 
 const isSafe = (report: number[]): boolean => {
   const d = diffs(report);
-  return (
-    (isAllPositive(d) || isAllNegative(d)) &&
-    isAllLeast(d, 3) &&
-    isAllMost(d, 1)
-  );
+
+  const isIncreasingOrDecreasing = isAllLeast(d, 1) || isAllMost(d, -1);
+
+  if (!isIncreasingOrDecreasing) {
+    return false;
+  }
+
+  const absDiffs = d.map(Math.abs);
+
+  return isAllMost(absDiffs, 3) && isAllLeast(absDiffs, 1);
 };
 
 export const solveStar1 = (input: string[]) => {
