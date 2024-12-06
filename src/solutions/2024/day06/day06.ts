@@ -9,45 +9,43 @@ interface Position {
   direction: "up" | "down" | "left" | "right";
 }
 
-const moveForward = (guard: Guard) => {
-  if (!guard.previousPositions[guard.position.x]) {
-    guard.previousPositions[guard.position.x] = {};
+const moveForward = ({ previousPositions, position }: Guard) => {
+  if (!previousPositions[position.x]) {
+    previousPositions[position.x] = {};
   }
-  if (!guard.previousPositions[guard.position.x][guard.position.y]) {
-    guard.previousPositions[guard.position.x][guard.position.y] = [];
+  if (!previousPositions[position.x][position.y]) {
+    previousPositions[position.x][position.y] = [];
   }
-  guard.previousPositions[guard.position.x][guard.position.y].push(
-    guard.position.direction
-  );
-  switch (guard.position.direction) {
+  previousPositions[position.x][position.y].push(position.direction);
+  switch (position.direction) {
     case "up":
-      guard.position.y--;
+      position.y--;
       break;
     case "down":
-      guard.position.y++;
+      position.y++;
       break;
     case "left":
-      guard.position.x--;
+      position.x--;
       break;
     case "right":
-      guard.position.x++;
+      position.x++;
       break;
   }
 };
 
-const turnRight = (guard: Guard) => {
-  switch (guard.position.direction) {
+const turnRight = ({ position }: Guard) => {
+  switch (position.direction) {
     case "up":
-      guard.position.direction = "right";
+      position.direction = "right";
       break;
     case "down":
-      guard.position.direction = "left";
+      position.direction = "left";
       break;
     case "left":
-      guard.position.direction = "up";
+      position.direction = "up";
       break;
     case "right":
-      guard.position.direction = "down";
+      position.direction = "down";
       break;
   }
 };
@@ -71,29 +69,7 @@ const isInMap = (input: string[], guard: Guard) => {
   return y >= 0 && y < input.length && x >= 0 && x < input[0].length;
 };
 
-export const solveStar1 = (input: string[]) => {
-  // find \^
-  const guardY = input.findIndex((line) => line.includes("^"));
-  const guardX = input[guardY].indexOf("^");
-
-  const guard: Guard = {
-    position: { x: guardX, y: guardY, direction: "up" },
-    previousPositions: [],
-  };
-
-  while (isInMap(input, guard)) {
-    if (hasObstacleAhead(input, guard)) {
-      turnRight(guard);
-    } else {
-      moveForward(guard);
-    }
-  }
-
-  return Object.values(guard.previousPositions).flatMap((x) => Object.values(x))
-    .length;
-};
-
-const isLooping = (input: string[], guard: Guard) => {
+const walkOutsideMap = (input: string[], guard: Guard) => {
   while (isInMap(input, guard)) {
     if (hasObstacleAhead(input, guard)) {
       turnRight(guard);
@@ -106,10 +82,28 @@ const isLooping = (input: string[], guard: Guard) => {
         guard.position.direction
       )
     ) {
-      return true;
+      // loop
+      return false;
     }
   }
-  return false;
+
+  // success
+  return true;
+};
+
+export const solveStar1 = (input: string[]) => {
+  const guardY = input.findIndex((line) => line.includes("^"));
+  const guardX = input[guardY].indexOf("^");
+
+  const guard: Guard = {
+    position: { x: guardX, y: guardY, direction: "up" },
+    previousPositions: [],
+  };
+
+  walkOutsideMap(input, guard);
+
+  return Object.values(guard.previousPositions).flatMap((x) => Object.values(x))
+    .length;
 };
 
 const putObstacle = (input: string[], position: Pick<Position, "x" | "y">) => {
@@ -128,15 +122,9 @@ export const solveStar2 = (input: string[]) => {
     previousPositions: [],
   };
 
-  while (isInMap(input, guard)) {
-    if (hasObstacleAhead(input, guard)) {
-      turnRight(guard);
-    } else {
-      moveForward(guard);
-    }
-  }
+  walkOutsideMap(input, guard);
 
-  const possibleObstaclePositions: { x: number; y: number }[] = Object.keys(
+  const possibleObstaclePositions = Object.keys(
     guard.previousPositions
   ).flatMap((x) =>
     Object.keys(guard.previousPositions[Number(x)]).map((y) => ({
@@ -146,7 +134,7 @@ export const solveStar2 = (input: string[]) => {
   );
 
   const loopPositions = possibleObstaclePositions.filter((position) => {
-    return isLooping(putObstacle(input, position), {
+    return !walkOutsideMap(putObstacle(input, position), {
       position: { x: guardX, y: guardY, direction: "up" },
       previousPositions: [],
     });
