@@ -25,7 +25,6 @@ describe("Day " + DAY, () => {
   });
 
   it("should solve star 2", () => {
-    // slow... 30 sek
     expect(solveStar2(input)).toBe(1686);
   });
 });
