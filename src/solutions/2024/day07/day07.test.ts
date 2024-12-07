@@ -1,9 +1,7 @@
 import { textReaderArr } from "../../../utils/textReader";
 import {
   evaluate,
-  findSolution,
-  numberToBinaryArray,
-  numberToTrinaryArray,
+  numberToArray,
   Operator,
   solveStar1,
   solveStar2,
@@ -29,18 +27,10 @@ describe("Day " + DAY, () => {
   });
 
   it("should be binary", () => {
-    expect(numberToBinaryArray(0, 3)).toEqual([0, 0, 0]);
-    expect(numberToBinaryArray(1, 3)).toEqual([1, 0, 0]);
-    expect(numberToBinaryArray(2, 3)).toEqual([0, 1, 0]);
-    expect(numberToBinaryArray(3, 3)).toEqual([1, 1, 0]);
-  });
-
-  it("should be trinary", () => {
-    expect(numberToTrinaryArray(0, 3)).toEqual([0, 0, 0]);
-    expect(numberToTrinaryArray(1, 3)).toEqual([1, 0, 0]);
-    expect(numberToTrinaryArray(2, 3)).toEqual([2, 0, 0]);
-    expect(numberToTrinaryArray(7, 3)).toEqual([1, 2, 0]);
-    expect(numberToTrinaryArray(11, 3)).toEqual([2, 0, 1]);
+    expect(numberToArray(0, 3)).toEqual("000".split(""));
+    expect(numberToArray(1, 3)).toEqual("001".split(""));
+    expect(numberToArray(2, 3)).toEqual("010".split(""));
+    expect(numberToArray(3, 3, 3)).toEqual("010".split(""));
   });
 
   it("should pass test", () => {

@@ -4,9 +4,9 @@ interface Equation {
 }
 
 export enum Operator {
-  ADD,
-  MUL,
-  CONC,
+  ADD = "0",
+  MUL = "1",
+  CONC = "2",
 }
 
 const parseInput = (input: string): Equation => {
@@ -17,9 +17,9 @@ const parseInput = (input: string): Equation => {
   };
 };
 
-export const evaluate = (numbers: number[], operators: Operator[]) => {
+export const evaluate = (numbers: number[], operators: string[]) => {
   return operators.reduce((acc, curr, index) => {
-    switch (curr) {
+    switch (curr as Operator) {
       case Operator.ADD:
         return acc + numbers[index + 1];
       case Operator.MUL:
@@ -30,37 +30,16 @@ export const evaluate = (numbers: number[], operators: Operator[]) => {
   }, numbers[0]);
 };
 
-export const numberToBinaryArray = (
+export const numberToArray = (
   num: number,
-  arrayLength: number
-): number[] => {
-  const arr = [];
-  for (let i = 0; i < arrayLength; i++) {
-    arr.push(num % 2);
-    num = Math.floor(num / 2);
-  }
-  return arr;
-};
+  arrayLength: number,
+  radix = 2
+): string[] => num.toString(radix).padStart(arrayLength, "0").split("");
 
-export const numberToTrinaryArray = (
-  num: number,
-  arrayLength: number
-): number[] => {
-  const arr = [];
-  for (let i = 0; i < arrayLength; i++) {
-    arr.push(num % 3);
-    num = Math.floor(num / 3);
-  }
-  return arr;
-};
-
-export const findSolution = (equation: Equation): boolean => {
-  return Array.from({ length: 2 ** (equation.numbers.length - 1) }).some(
+export const findSolution = (equation: Equation, ops = 2): boolean => {
+  return Array.from({ length: ops ** (equation.numbers.length - 1) }).some(
     (_, i) => {
-      const operators = numberToBinaryArray(
-        i,
-        equation.numbers.length - 1
-      ) as Operator[];
+      const operators = numberToArray(i, equation.numbers.length - 1, ops);
       return evaluate(equation.numbers, operators) === equation.res;
     }
   );
@@ -69,27 +48,15 @@ export const findSolution = (equation: Equation): boolean => {
 export const solveStar1 = (input: string[]) => {
   return input
     .map(parseInput)
-    .filter(findSolution)
+    .filter((eq) => findSolution(eq, 2))
     .map((eq) => eq.res)
     .reduce((acc, curr) => acc + curr, 0);
-};
-
-export const findSolution2 = (equation: Equation): boolean => {
-  return Array.from({ length: 3 ** (equation.numbers.length - 1) }).some(
-    (_, i) => {
-      const operators = numberToTrinaryArray(
-        i,
-        equation.numbers.length - 1
-      ) as Operator[];
-      return evaluate(equation.numbers, operators) === equation.res;
-    }
-  );
 };
 
 export const solveStar2 = (input: string[]) => {
   return input
     .map(parseInput)
-    .filter(findSolution2)
+    .filter((eq) => findSolution(eq, 3))
     .map((eq) => eq.res)
     .reduce((acc, curr) => acc + curr, 0);
 };
