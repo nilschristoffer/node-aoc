@@ -20,31 +20,35 @@ const mapInput = (input: string[]): AntennasByFrequency => {
   return antennas;
 };
 
-const isWithinMap = (input: string[], { x, y }: Location) => {
-  return x >= 0 && x < input[0].length && y >= 0 && y < input.length;
+const isWithinMap = ({ x, y }: Location, width: number, height: number) => {
+  return x >= 0 && x < width && y >= 0 && y < height;
 };
 
-const isEqualLocation = (loc1: Location, loc2: Location) => {
-  return loc1.x === loc2.x && loc1.y === loc2.y;
+const isEqualLocation = (
+  { x: x1, y: y1 }: Location,
+  { x: x2, y: y2 }: Location
+) => {
+  return x1 === x2 && y1 === y2;
 };
 
 const getAntiNodes = (loc1: Location, loc2: Location): Location[] => {
   const diffX = loc1.x - loc2.x;
   const diffY = loc1.y - loc2.y;
 
-  const antiNode2 = { x: loc2.x - diffX, y: loc2.y - diffY };
-  const antiNode3 = { x: loc1.x + diffX, y: loc1.y + diffY };
+  const antiNode1 = { x: loc2.x - diffX, y: loc2.y - diffY };
+  const antiNode2 = { x: loc1.x + diffX, y: loc1.y + diffY };
 
-  return [antiNode2, antiNode3].filter(
-    (an) => !isEqualLocation(loc1, an) && !isEqualLocation(loc2, an)
-  );
+  return [antiNode1, antiNode2];
 };
 
-const getAllAntiNodes = (locations: Location[]) => {
+const getAllAntiNodes = (
+  locations: Location[],
+  method: (loc1: Location, loc2: Location) => Location[]
+) => {
   const antiNodes: Location[] = [];
   for (let i = 0; i < locations.length; i++) {
     for (let j = i + 1; j < locations.length; j++) {
-      antiNodes.push(...getAntiNodes(locations[i], locations[j]));
+      antiNodes.push(...method(locations[i], locations[j]));
     }
   }
   return antiNodes;
@@ -61,9 +65,13 @@ const uniqueLocations = (locations: Location[]): Location[] => {
 };
 
 export const solveStar1 = (input: string[]) => {
+  const width = input[0].length;
+  const height = input.length;
   const antennasByFreq: AntennasByFrequency = mapInput(input);
   const antinodes = Object.values(antennasByFreq).flatMap((antennas) => {
-    return getAllAntiNodes(antennas).filter((loc) => isWithinMap(input, loc));
+    return getAllAntiNodes(antennas, getAntiNodes).filter((loc) =>
+      isWithinMap(loc, width, height)
+    );
   });
 
   return uniqueLocations(antinodes).length;
@@ -78,63 +86,33 @@ const getContinuousAntinodes = (
   const diffX = loc1.x - loc2.x;
   const diffY = loc1.y - loc2.y;
   const antiNodes: Location[] = [];
-  let antiNodesCandidate1: Location = loc1;
-  while (
-    antiNodesCandidate1.x >= 0 &&
-    antiNodesCandidate1.x < width &&
-    antiNodesCandidate1.y >= 0 &&
-    antiNodesCandidate1.y < height
-  ) {
-    antiNodes.push({
-      x: antiNodesCandidate1.x,
-      y: antiNodesCandidate1.y,
-    });
-    antiNodesCandidate1 = {
-      x: antiNodesCandidate1.x - diffX,
-      y: antiNodesCandidate1.y - diffY,
+  let candidate1: Location = loc1;
+  while (isWithinMap(candidate1, width, height)) {
+    antiNodes.push(candidate1);
+    candidate1 = {
+      x: candidate1.x - diffX,
+      y: candidate1.y - diffY,
     };
   }
 
-  let antiNodesCandidate2: Location = loc2;
-  while (
-    antiNodesCandidate2.x >= 0 &&
-    antiNodesCandidate2.x < width &&
-    antiNodesCandidate2.y >= 0 &&
-    antiNodesCandidate2.y < height
-  ) {
-    antiNodes.push({
-      x: antiNodesCandidate2.x,
-      y: antiNodesCandidate2.y,
-    });
-    antiNodesCandidate2 = {
-      x: antiNodesCandidate2.x + diffX,
-      y: antiNodesCandidate2.y + diffY,
+  let candidate2: Location = loc2;
+  while (isWithinMap(candidate2, width, height)) {
+    antiNodes.push(candidate2);
+    candidate2 = {
+      x: candidate2.x + diffX,
+      y: candidate2.y + diffY,
     };
   }
 
-  return antiNodes;
-};
-
-const getAllContinuousAntiNodes = (
-  locations: Location[],
-  width: number,
-  height: number
-) => {
-  const antiNodes: Location[] = [];
-  for (let i = 0; i < locations.length; i++) {
-    for (let j = i + 1; j < locations.length; j++) {
-      antiNodes.push(
-        ...getContinuousAntinodes(locations[i], locations[j], width, height)
-      );
-    }
-  }
   return antiNodes;
 };
 
 export const solveStar2 = (map: string[]) => {
   const antennasByFreq: AntennasByFrequency = mapInput(map);
   const antinodes = Object.values(antennasByFreq).flatMap((antennas) => {
-    return getAllContinuousAntiNodes(antennas, map[0].length, map.length);
+    return getAllAntiNodes(antennas, (l1, l2) =>
+      getContinuousAntinodes(l1, l2, map[0].length, map.length)
+    );
   });
 
   return uniqueLocations(antinodes).length;
