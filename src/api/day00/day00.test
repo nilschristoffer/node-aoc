@@ -17,7 +17,7 @@ describe("Day " + DAY, () => {
   });
 
   it("should solve star 1", () => {
-    expect(solveStar1(input)).toBe(null);
+    expect(solveStar1(input)).toBe("Answer 1: ");
   });
 
   it("should pass test for star 2", () => {
@@ -25,6 +25,6 @@ describe("Day " + DAY, () => {
   });
 
   it("should solve star 2", () => {
-    // expect(solveStar2(input)).toBe(null);
+    // expect(solveStar2(input)).toBe("Answer 2: ");
   });
 });
