@@ -31,61 +31,44 @@ export const solveStar1 = (input: string[], times = 25) => {
 
 type StoneRecord = {
   [stone: number]: {
-    newStones: number[];
-    stonesToEnd?: { [step: number]: number };
+    nextStones: number[];
   };
 };
 
-const reArrangeRecursive = (stone: number, stoneRecord: StoneRecord = {}) => {
+const reArrangeRecursive = (stoneRecord: StoneRecord, stone: number) => {
   if (stoneRecord[stone]) {
     return stoneRecord;
   }
 
-  const newStones = reArrange(stone);
+  const nextStones = reArrange(stone);
   stoneRecord[stone] = {
-    newStones,
+    nextStones,
   };
-  newStones.forEach((stone) => {
-    stoneRecord = reArrangeRecursive(stone, stoneRecord);
+  nextStones.forEach((stone) => {
+    stoneRecord = reArrangeRecursive(stoneRecord, stone);
   });
 
   return stoneRecord;
 };
 
+type StonesToEndRecord = { [number: string]: { [step: number]: number } };
+
 export const solveStar2 = (input: string[], times: number) => {
   const stones = parseInput(input);
-  let records = stones.reduce(
-    (acc, curr) => reArrangeRecursive(curr, acc),
-    {} as StoneRecord
-  );
+  const tree = stones.reduce<StoneRecord>(reArrangeRecursive, {});
 
-  for (let step = 0; step <= times; step++) {
-    records = Object.entries(records).reduce<StoneRecord>(
-      (acc, [stone, { newStones, stonesToEnd }]) => {
-        acc[Number(stone)] = {
-          ...acc[Number(stone)],
-          stonesToEnd: {
-            ...stonesToEnd,
-            [step]:
-              step === 0
-                ? 1
-                : newStones
-                    .map(Number)
-                    .reduce(
-                      (prev, ns) => prev + acc[ns].stonesToEnd?.[step - 1]!,
-                      0
-                    ),
-          },
-        };
+  const res = Array.from({
+    length: times + 1,
+  }).reduce<StonesToEndRecord>((acc, _, step) => {
+    Object.entries(tree).forEach(([stone, { nextStones: newStones }]) => {
+      acc[stone] = acc[stone] || {};
+      acc[stone][step] = newStones.reduce(
+        (sum, ns) => sum + acc[ns]?.[step - 1] || 1,
+        0
+      );
+    });
+    return acc;
+  }, {});
 
-        return acc;
-      },
-      records as StoneRecord
-    );
-  }
-
-  return stones.reduce(
-    (acc, curr) => acc + (records[curr].stonesToEnd?.[times] || 0),
-    0
-  );
+  return stones.reduce((acc, curr) => acc + (res[curr][times] || 0), 0);
 };
